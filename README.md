@@ -33,7 +33,7 @@ Both projects are licensed under the AGPL-3.0 License - see the [LICENSE](LICENS
    ```
 2. **Install required Python packages:**
 ```bash
-pip install -r requirements.txt
+pip install opencv-python
 ```
 3. ***For Jetracer on Jetson Nano***
 Run the script using the Jetson Nano’s onboard camera by default:
