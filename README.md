@@ -46,18 +46,18 @@ To process a video file:
 ### Configuration
 Make sure to activate specific code related to Jetracer and Jetson Nano in the script as per your setup.
 
-5 **Features**
+### Features
 1. Utilizes GStreamer pipeline optimized for Jetson Nano.
 2. Dynamic region of interest and gradient thresholding for precise lane detection.
 3. Hough Transform for line detection and polynomial regression for lane curvature estimation.
 4. PID control logic to adjust Jetracer's steering based on lane position.
 
 
-6 **Contributing**
+### Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
-7 **Acknowledgments**
+### Acknowledgments
 University of Nottingham
 Department of Electrical and Electronic Engineering
