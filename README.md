@@ -34,10 +34,11 @@ pip install -r requirements.txt
 Run the script using the Jetson Nano’s onboard camera by default:
    ```bash
    python lanedet_jetson_nano.py
-   
+   ```
 To process a specific image:
    ```bash
    python lanedet_jetson_nano.py --source ./data/test_image.jpg
+   ```
 To process a video file:
    ```bash
    python lanedet_jetson_nano.py --source ./videos/test_video.mp4
