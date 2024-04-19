@@ -43,7 +43,7 @@ To process a video file:
    ```bash
    python lanedet_jetson_nano.py --source ./videos/test_video.mp4
    ```
-4. **Configuration**
+### Configuration
 Make sure to activate specific code related to Jetracer and Jetson Nano in the script as per your setup.
 
 5 **Features**
