@@ -35,16 +35,13 @@ Both projects are licensed under the AGPL-3.0 License - see the [LICENSE](LICENS
 ```bash
 pip install -r requirements.txt
 ```
-For Jetracer on Jetson Nano
+3. For Jetracer on Jetson Nano
 Run the script using the Jetson Nano’s onboard camera by default:
 ```bash
 python lanedet_jetson_nano.py
 ```
-For Real World Detection
-```bash
+4. For Real World Detection
 Run the script using the default image or specify a source:
-```
-
 ```bash
 python lanedet_realworld.py                                 # Default image
 python lanedet_realworld.py --source ./data/test_image.jpg  # Specific image
