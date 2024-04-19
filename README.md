@@ -53,11 +53,11 @@ Make sure to activate specific code related to Jetracer and Jetson Nano in the s
 4. PID control logic to adjust Jetracer's steering based on lane position.
 
 
-6. **Contributing**
+6 **Contributing**
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
-7. **Acknowledgments**
+7 **Acknowledgments**
 University of Nottingham
 Department of Electrical and Electronic Engineering
