@@ -40,12 +40,16 @@ Run the script using the Jetson Nano’s onboard camera by default:
 ```bash
 python lanedet_jetson_nano.py
 ```
+Run the script using test image:
+```bash
+python lanedet_jetson_nano.py --source data/images/lane7.png
+```
 4. For Real World Detection.
 Run the script using the default image or specify a source:
 ```bash
 python lanedet_realworld.py                                 # Default image
-python lanedet_realworld.py --source ./data/test_image.jpg  # Specific image
-python lanedet_realworld.py --source ./videos/test_video.mp4 # Specific video
+python lanedet_realworld.py --source ./Data/5.png  # Specific image
+python lanedet_realworld.py --source ./Data/Videos/solidWhiteRight.mp4    # Specific video
 python lanedet_realworld.py --source 0                      # Webcam
 ```
 
