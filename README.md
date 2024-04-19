@@ -52,6 +52,7 @@ Make sure to activate specific code related to Jetracer and Jetson Nano in the s
 3. Hough Transform for line detection and polynomial regression for lane curvature estimation.
 4. PID control logic to adjust Jetracer's steering based on lane position.
 
+
 6. **Contributing**
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
