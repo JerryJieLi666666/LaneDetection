@@ -64,5 +64,5 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ### Acknowledgments
-University of Nottingham
+University of Nottingham,
 Department of Electrical and Electronic Engineering
