@@ -35,7 +35,7 @@ Both projects are licensed under the AGPL-3.0 License - see the [LICENSE](LICENS
 ```bash
 pip install -r requirements.txt
 ```
-3. For Jetracer on Jetson Nano
+3. ***For Jetracer on Jetson Nano***
 Run the script using the Jetson Nano’s onboard camera by default:
 ```bash
 python lanedet_jetson_nano.py
@@ -44,7 +44,7 @@ Run the script using test image:
 ```bash
 python lanedet_jetson_nano.py --source data/images/lane7.png
 ```
-4. For Real World Detection.
+4. ***For Real World Detection***
 Run the script using the default image or specify a source:
 ```bash
 python lanedet_realworld.py                                 # Default image
@@ -61,6 +61,7 @@ Ensure to activate specific code related to Jetracer and Jetson Nano in the scri
 2. Dynamic region of interest and gradient thresholding for precise lane detection in both projects.
 3. Hough Transform for line detection and polynomial regression for lane curvature estimation.
 4. PID control logic to adjust Jetracer's steering based on lane position in the Jetracer project.
+5. ***'apply_gradient_threshold()' function can take lots of calculation for jetson nano in real time detection, 'calculate_dynamic_threshold()' function can be an alternative method of calculating dynamic threshold***
 
 ### Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
