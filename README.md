@@ -37,11 +37,11 @@ Run the script using the Jetson Nano’s onboard camera by default:
    ```
 To process a specific image:
    ```bash
-   python lanedet_jetson_nano.py --source ./data/test_image.jpg
+   python lanedet_jetson_nano.py --source ./data/images/test_image.jpg
    ```
 To process a video file:
    ```bash
-   python lanedet_jetson_nano.py --source ./videos/test_video.mp4
+   python lanedet_jetson_nano.py --source ./data/videos/test_video.mp4
    ```
 ### Configuration
 Make sure to activate specific code related to Jetracer and Jetson Nano in the script as per your setup.
