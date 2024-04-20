@@ -46,9 +46,7 @@ error = 0
 
 def gstreamer_pipeline(capture_width=1640, capture_height=1232, display_width=960, display_height=540, framerate=10,
                        flip_method=0):
-    """
-    返回适用于Jetson Nano的GStreamer管道字符串。
-    """
+    # Returns the GStreamer pipeline string for the Jetson Nano.
     return (
         f"nvarguscamerasrc ! "
         f"video/x-raw(memory:NVMM), "
@@ -168,7 +166,7 @@ def filter_lines_both_sides(lines_left, lines_right, line_image, width, slope_th
         if lines is not None:
             for line in lines:
                 for x1, y1, x2, y2 in line:
-                    if (x2 - x1) != 0:  # 防止除以零
+                    if (x2 - x1) != 0:  # Prevent division by zero
                         slope = (y2 - y1) / (x2 - x1)
                         if slope_threshold[0] < abs(slope) < slope_threshold[1]:
                             num_points = int(np.hypot(x2 - x1, y2 - y1) // sample_step)
