@@ -51,6 +51,7 @@ python lanedet_realworld.py                                 # Default image
 python lanedet_realworld.py --source ./Data/5.png  # Specific image
 python lanedet_realworld.py --source ./Data/Videos/solidWhiteRight.mp4    # Specific video
 python lanedet_realworld.py --source 0                      # Webcam
+python lanedet_realworld.py --source ./Data/dataset  # Specific dataset
 ```
 
 ### Configuration
