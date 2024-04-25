@@ -30,6 +30,7 @@ Example commands:
     $ python lanedet_realworld.py                                 # Runs detection on the default image set in the script
     $ python lanedet_realworld.py --source ./data/image/5.png  # Processes a specified image
     $ python lanedet_realworld.py --source ./data/videos/solidWhiteRight.mp4.mp4 # Processes a specified video
+    $ python lanedet_realworld.py --source ./data/dataset # Processes a dataset
     $ python lanedet_realworld.py --source 0                       # Processes video feed from the default webcam
 """
 
@@ -40,7 +41,7 @@ import argparse
 import os
 
 
-def apply_gradient_threshold(image, sigma=4):
+def apply_gradient_threshold(image, sigma=3):
     # Calculate gradients in x and y direction using Sobel operator
     grad_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
     grad_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
@@ -62,23 +63,23 @@ def apply_gradient_threshold(image, sigma=4):
 
 def apply_mask(edges, height, width):
     # Define polygonal mask for the edges
-    poly_bottom_y = int(11 * height / 12)  # The y-coordinate of the bottom of the polygon
+    poly_bottom_y = int(3 * height / 4)  # The y-coordinate of the bottom of the polygon
     # poly_top_y = int(2 * height / 3)  # The y-coordinate of the top of the polygon
-    poly_top_y = int(3 * height / 5)  # The y-coordinate of the top of the polygon
+    poly_top_y = int(2.5 * height / 5)  # The y-coordinate of the top of the polygon
     center_x = width // 2                # Center x-coordinate of the image
 
     # Define polygons for left and right lane masking
     left_polygon = np.array([
-        [(int(width / 7), poly_bottom_y),
-         (center_x - int(width / 5), poly_bottom_y),  # Shift left from center
+        [(int(width / 5), poly_bottom_y),
+         (center_x - int(0 * width / 15), poly_bottom_y),  # Shift left from center
          (center_x, poly_top_y),
-         (center_x - int(width / 12), poly_top_y)]
+         (center_x - int(width / 20), poly_top_y)]
     ], np.int32)
 
     right_polygon = np.array([
-        [(center_x + int(width / 5), poly_bottom_y),  # Shift right from center
-         (int(6 * width / 7), poly_bottom_y),
-         (center_x + int(width / 12), poly_top_y),
+        [(center_x + int(0 * width / 15), poly_bottom_y),  # Shift right from center
+         (int(4 * width / 5), poly_bottom_y),
+         (center_x + int(width / 20), poly_top_y),
          (center_x, poly_top_y)]
     ], np.int32)
 
@@ -99,22 +100,22 @@ def detect_lanes_hough_transform(masked_edges, frame, width):
     right_edges = masked_edges[:, width // 2:]
 
     # Lane detection based on Hough transform
-    lines_left = cv2.HoughLinesP(left_edges, 1, np.pi / 180, 10, np.array([]), minLineLength=50, maxLineGap=100)
-    lines_right = cv2.HoughLinesP(right_edges, 1, np.pi / 180, 10, np.array([]), minLineLength=50, maxLineGap=100)
+    lines_left = cv2.HoughLinesP(left_edges, 1, np.pi / 180, 10, np.array([]), minLineLength=10, maxLineGap=50)
+    lines_right = cv2.HoughLinesP(right_edges, 1, np.pi / 180, 10, np.array([]), minLineLength=10, maxLineGap=50)
 
     # Create an empty image for drawing lines
     line_image = np.zeros_like(frame)
 
     return line_image, lines_left, lines_right
 
-def filter_lines_both_sides(lines_left, lines_right, line_image, width, slope_threshold=(0.5, 2), sample_step=5):
+def filter_lines_both_sides(lines_left, lines_right, line_image, width, slope_threshold=(0.3, 4), sample_step=5):
     # Filter and sample the points of the left and right line segments that meet the slope requirement.
     def filter_lines(lines, width_offset=0):
         points = []
         if lines is not None:
             for line in lines:
                 for x1, y1, x2, y2 in line:
-                    if (x2 - x1) != 0:  # Prevent division by zero
+                    if (x2 - x1) != 0:  # 防止除以零
                         slope = (y2 - y1) / (x2 - x1)
                         if slope_threshold[0] < abs(slope) < slope_threshold[1]:
                             num_points = int(np.hypot(x2 - x1, y2 - y1) // sample_step)
@@ -159,44 +160,44 @@ def fit_and_draw_polyline(left_points, right_points, line_image, height, poly_to
 
     return left_fit_fn, right_fit_fn
 
-def calculate_and_visualize_lane_center(frame, left_poly, right_poly, poly_top_y, poly_bottom_y, width, step=10,
-                                        color=(255, 0, 0), thickness=2):
-
-    # Calculate the lane median, plot it onto the image, and calculate the average deviation of the median from the centre of the image.
-
-    if left_poly is None or right_poly is None:
-        return frame, 0
-
-    ys = np.arange(poly_top_y, poly_bottom_y, step)
-    left_xs = left_poly(ys)
-    right_xs = right_poly(ys)
-
-    center_xs = (left_xs + right_xs) / 2
-    lane_center_line = np.column_stack((center_xs, ys)).astype(np.int32)
-
-    # Visualisation of the lane centre line
-    for x, y in lane_center_line:
-        cv2.circle(frame, (int(x), int(y)), radius=2, color=color, thickness=thickness)
-
-    # Calculate the average of the distance from the centre of the lane to the centre of the image
-    image_center_x = width // 2
-    deviations = center_xs - image_center_x
-    average_deviation = int(np.mean(deviations))
-
-    # Text Setting
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.5
-    font_color = (255, 255, 255)
-    font_thickness = 2
-
-    # Print the coordinates and deviation at the bottom
-    cv2.line(frame, (image_center_x, poly_bottom_y), (image_center_x, poly_top_y), (0, 0, 255), 5)
-
-    cv2.putText(frame, f'Error: {average_deviation}', (image_center_x, int((poly_top_y + poly_bottom_y) / 2)), font,
-                font_scale * 2, font_color,
-                font_thickness, cv2.LINE_AA)
-
-    return frame
+# def calculate_and_visualize_lane_center(frame, left_poly, right_poly, poly_top_y, poly_bottom_y, width, step=10,
+#                                         color=(255, 0, 0), thickness=2):
+#
+#     # Calculate the lane median, plot it onto the image, and calculate the average deviation of the median from the centre of the image.
+#
+#     if left_poly is None or right_poly is None:
+#         return frame, 0
+#
+#     ys = np.arange(poly_top_y, poly_bottom_y, step)
+#     left_xs = left_poly(ys)
+#     right_xs = right_poly(ys)
+#
+#     center_xs = (left_xs + right_xs) / 2
+#     lane_center_line = np.column_stack((center_xs, ys)).astype(np.int32)
+#
+#     # Visualisation of the lane centre line
+#     for x, y in lane_center_line:
+#         cv2.circle(frame, (int(x), int(y)), radius=2, color=color, thickness=thickness)
+#
+#     # Calculate the average of the distance from the centre of the lane to the centre of the image
+#     image_center_x = width // 2
+#     deviations = center_xs - image_center_x
+#     average_deviation = int(np.mean(deviations))
+#
+#     # Text Setting
+#     font = cv2.FONT_HERSHEY_SIMPLEX
+#     font_scale = 0.5
+#     font_color = (255, 255, 255)
+#     font_thickness = 2
+#
+#     # Print the coordinates and deviation at the bottom
+#     cv2.line(frame, (image_center_x, poly_bottom_y), (image_center_x, poly_top_y), (0, 0, 255), 5)
+#
+#     cv2.putText(frame, f'Error: {average_deviation}', (image_center_x, int((poly_top_y + poly_bottom_y) / 2)), font,
+#                 font_scale * 2, font_color,
+#                 font_thickness, cv2.LINE_AA)
+#
+#     return frame
 
 def detect_lane_lines(frame, show_steps=True):
     if show_steps:
@@ -246,12 +247,12 @@ def detect_lane_lines(frame, show_steps=True):
     if show_steps:
         cv2.imshow('Line Image', line_image)
 
-    # Calculate the lane centre line, plot it on the image and obtain the mean deviation
-    line_image = calculate_and_visualize_lane_center(line_image, left_poly, right_poly, poly_top_y,
-                                                            poly_bottom_y, width)
-
-    if show_steps:
-        cv2.imshow('Error Calculation', line_image)
+    # # Calculate the lane centre line, plot it on the image and obtain the mean deviation
+    # line_image = calculate_and_visualize_lane_center(line_image, left_poly, right_poly, poly_top_y,
+    #                                                         poly_bottom_y, width)
+    #
+    # if show_steps:
+    #     cv2.imshow('Error Calculation', line_image)
 
     # Image combination
     result = cv2.addWeighted(frame, 0.8, line_image, 1, 0)
@@ -315,6 +316,22 @@ def process_video(video_path):
     print(f"Processed video saved to {new_result_folder}")
 
 
+def process_folder(folder_path):
+    new_result_folder = create_next_results_folder()  # Creating a new results folder
+    # Loop through all files in the folder_path
+    for filename in os.listdir(folder_path):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):  # Check for supported image formats
+            image_path = os.path.join(folder_path, filename)
+            image = cv2.imread(image_path)
+            if image is None:
+                print(f"Error: Unable to open/read file: {image_path}")
+                continue  # Skip this file and move to the next
+            lane_image = detect_lane_lines(image)
+            save_path = os.path.join(new_result_folder, filename)
+            cv2.imwrite(save_path, lane_image)  # Save image
+            print(f"Processed image saved to {save_path}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Lane Lines Detection with Dynamic ROI and Preprocessing")
     parser.add_argument("--source", type=str, default='Data/Images/5.png',
@@ -323,7 +340,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     source = args.source
-    if source.isdigit():  # If source is a digit, assume it's a camera index
+
+    if os.path.isdir(source):  # If source is a directory
+        print(f"Processing all images in folder: {source}")
+        process_folder(source)
+    elif source.isdigit():  # If source is a digit, assume it's a camera index
         process_video(int(source))
     elif source.lower().endswith(('.png', '.jpg', '.jpeg')):  # If source is an image file
         process_image(source)
